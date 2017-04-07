@@ -1,0 +1,31 @@
+{
+    "name": "dario_swain/stash-api",
+    "type": "library",
+    "description": "REST-ish endpoint for interacting with Stash",
+    "keywords": ["Stash API","api","sdk"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ilya Pokamestov",
+            "email": "dario_swain@yahoo.com",
+            "homepage": "http://github.com/DarioSwain",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "mashape/unirest-php": "~3.0.1",
+        "apimatic/jsonmapper": "~1.2.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "StashAPILib\\": "src/"
+        }
+    }
+}
