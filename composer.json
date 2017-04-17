@@ -13,19 +13,21 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.4",
         "ext-curl": "*",
         "ext-json": "*",
-        "ext-mbstring": "*",
-        "mashape/unirest-php": "~3.0.1",
-        "apimatic/jsonmapper": "~1.2.0"
+        "ext-mbstring": "*"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^2.7"
+        "phpunit/phpunit": "~4.8",
+        "satooshi/php-coveralls": "~1.0",
+        "squizlabs/php_codesniffer": "~2.6",
+        "friendsofphp/php-cs-fixer": "~1.12"
     },
     "autoload": {
-        "psr-4": {
-            "StashAPILib\\": "src/"
-        }
+        "psr-4": { "Swagger\\Client\\" : "lib/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Swagger\\Client\\" : "test/" }
     }
 }
