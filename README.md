@@ -1,3 +1,5 @@
+**UNSTABLE - under heavy development.**
+
 # About
 
 Auto-generated PHP client for Stash API. Was generated using [APIMATIC](https://apimatic.io/), based on Stash official [WADL definition](https://developer.atlassian.com/static/rest/stash/3.11.6/stash-rest.wadl).
@@ -858,8 +860,8 @@ $result = $repository->getRepositoryCommits($projectKey, $repositorySlug, $path,
 function getRepositoryCommit(
         $projectKey,
         $repositorySlug,
-        $path = null,
-        $commitId = null)
+        $commitId,
+        $path = null)
 ```
 
 #### Parameters
@@ -868,10 +870,10 @@ function getRepositoryCommit(
 |-----------|------|-------------|
 | projectKey |  ``` Required ```  | TODO: Add a parameter description |
 | repositorySlug |  ``` Required ```  | TODO: Add a parameter description |
+| commitId |  ``` Required ```  | the commit ID to retrieve |
 | path |  ``` Optional ```  | an optional path to filter the commit by. If supplied the details returned <i>may not</i>
              be for the specified commit. Instead, starting from the specified commit, they will be the
              details for the first commit affecting the specified path. |
-| commitId |  ``` Optional ```  | the commit ID to retrieve |
 
 
 
@@ -880,10 +882,10 @@ function getRepositoryCommit(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$path = 'path';
 $commitId = 'commitId';
+$path = 'path';
 
-$result = $repository->getRepositoryCommit($projectKey, $repositorySlug, $path, $commitId);
+$result = $repository->getRepositoryCommit($projectKey, $repositorySlug, $commitId, $path);
 
 ```
 
@@ -1769,7 +1771,7 @@ $dynamic = array('key' => 'value');
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
 $commitId = 'commitId';
-$commentId = 166;
+$commentId = 51;
 
 $result = $repository->updateRepositoryCommitComment($dynamic, $projectKey, $repositorySlug, $commitId, $commentId);
 
@@ -1816,7 +1818,7 @@ function deleteRepositoryCommitComment(
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
 $commitId = 'commitId';
-$commentId = 3;
+$commentId = 51;
 $version = -1;
 
 $result = $repository->deleteRepositoryCommitComment($projectKey, $repositorySlug, $commitId, $commentId, $version);
@@ -1857,7 +1859,7 @@ function getRepositoryCommitComment(
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
 $commitId = 'commitId';
-$commentId = 3;
+$commentId = 51;
 
 $result = $repository->getRepositoryCommitComment($projectKey, $repositorySlug, $commitId, $commentId);
 
@@ -3569,7 +3571,7 @@ function deleteUnwatchPullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 
 $result = $pullRequest->deleteUnwatchPullRequest($projectKey, $repositorySlug, $pullRequestId);
 
@@ -3606,7 +3608,7 @@ function createWatchPullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 
 $result = $pullRequest->createWatchPullRequest($projectKey, $repositorySlug, $pullRequestId);
 
@@ -3761,7 +3763,7 @@ function getPullRequestCommits(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 $withCounts = true;
 
 $result = $pullRequest->getPullRequestCommits($projectKey, $repositorySlug, $pullRequestId, $withCounts);
@@ -3938,7 +3940,7 @@ function createPullRequestComment(
 $dynamic = array('key' => 'value');
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 
 $result = $pullRequest->createPullRequestComment($dynamic, $projectKey, $repositorySlug, $pullRequestId);
 
@@ -3974,7 +3976,7 @@ function getPullRequestComments(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 $path = 'path';
 
 $result = $pullRequest->getPullRequestComments($projectKey, $repositorySlug, $pullRequestId, $path);
@@ -4022,8 +4024,8 @@ function updatePullRequestComment(
 $dynamic = array('key' => 'value');
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
-$commentId = 216;
+$pullRequestId = 234;
+$commentId = 234;
 
 $result = $pullRequest->updatePullRequestComment($dynamic, $projectKey, $repositorySlug, $pullRequestId, $commentId);
 
@@ -4068,8 +4070,8 @@ function deletePullRequestComment(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
-$commentId = 216;
+$pullRequestId = 234;
+$commentId = 234;
 $version = -1;
 
 $result = $pullRequest->deletePullRequestComment($projectKey, $repositorySlug, $pullRequestId, $commentId, $version);
@@ -4109,8 +4111,8 @@ function getPullRequestComment(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
-$commentId = 216;
+$pullRequestId = 234;
+$commentId = 234;
 
 $result = $pullRequest->getPullRequestComment($projectKey, $repositorySlug, $pullRequestId, $commentId);
 
@@ -4238,43 +4240,15 @@ $result = $pullRequest->getPullRequests($projectKey, $repositorySlug, $direction
 
 ```
 
+#### Errors
 
-#### <a name="create_pull_request"></a>![Method: ](https://apidocs.io/img/method.png ".PullRequestController.createPullRequest") createPullRequest
+| Error Code | Error Description |
+|------------|-------------------|
+| 400 | The request was malformed. |
+| 401 | The currently authenticated user has insufficient permissions to view the specified pull request. |
+| 404 | The specified repository or pull request does not exist. |
+| 0 | Something goes wrong. |
 
-> Create a new pull request between two branches. The branches may be in the same repository, or different ones.
->  When using different repositories, they must still be in the same {@link Repository#getHierarchyId() hierarchy}.
->  <p>
->  The authenticated user must have <strong>REPO_READ</strong> permission for the "from" and "to"repositories to
->  call this resource.
-
-
-```php
-function createPullRequest(
-        $dynamic,
-        $projectKey,
-        $repositorySlug)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| dynamic |  ``` Required ```  | TODO: Add a parameter description |
-| projectKey |  ``` Required ```  | TODO: Add a parameter description |
-| repositorySlug |  ``` Required ```  | TODO: Add a parameter description |
-
-
-
-#### Example Usage
-
-```php
-$dynamic = array('key' => 'value');
-$projectKey = 'projectKey';
-$repositorySlug = 'repositorySlug';
-
-$result = $pullRequest->createPullRequest($dynamic, $projectKey, $repositorySlug);
-
-```
 
 
 #### <a name="create_decline_pull_request"></a>![Method: ](https://apidocs.io/img/method.png ".PullRequestController.createDeclinePullRequest") createDeclinePullRequest
@@ -4312,7 +4286,7 @@ function createDeclinePullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 $version = -1;
 
 $result = $pullRequest->createDeclinePullRequest($projectKey, $repositorySlug, $pullRequestId, $version);
@@ -4360,8 +4334,8 @@ function getPullRequestActivities(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
-$fromId = 216;
+$pullRequestId = 234;
+$fromId = 234;
 $fromType = 'fromType';
 
 $result = $pullRequest->getPullRequestActivities($projectKey, $repositorySlug, $pullRequestId, $fromId, $fromType);
@@ -4404,7 +4378,7 @@ function createReopenPullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 $version = -1;
 
 $result = $pullRequest->createReopenPullRequest($projectKey, $repositorySlug, $pullRequestId, $version);
@@ -4448,7 +4422,7 @@ function getCanMergePullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 
 $result = $pullRequest->getCanMergePullRequest($projectKey, $repositorySlug, $pullRequestId);
 
@@ -4490,7 +4464,7 @@ function createMergePullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 216;
+$pullRequestId = 234;
 $version = -1;
 
 $result = $pullRequest->createMergePullRequest($projectKey, $repositorySlug, $pullRequestId, $version);
@@ -4622,7 +4596,7 @@ function createAssignPullRequestParticipantRole(
 $dynamic = array('key' => 'value');
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 53;
+$pullRequestId = 234;
 
 $result = $pullRequest->createAssignPullRequestParticipantRole($dynamic, $projectKey, $repositorySlug, $pullRequestId);
 
@@ -4667,7 +4641,7 @@ function deleteUnassignPullRequestParticipantRole(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 53;
+$pullRequestId = 234;
 $username = 'username';
 
 $result = $pullRequest->deleteUnassignPullRequestParticipantRole($projectKey, $repositorySlug, $pullRequestId, $username);
@@ -4705,7 +4679,7 @@ function listPullRequestParticipants(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 53;
+$pullRequestId = 234;
 
 $result = $pullRequest->listPullRequestParticipants($projectKey, $repositorySlug, $pullRequestId);
 
@@ -4742,7 +4716,7 @@ function createApprovePullRequest(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 53;
+$pullRequestId = 234;
 
 $result = $pullRequest->createApprovePullRequest($projectKey, $repositorySlug, $pullRequestId);
 
@@ -4779,11 +4753,60 @@ function deleteWithdrawPullRequestApproval(
 ```php
 $projectKey = 'projectKey';
 $repositorySlug = 'repositorySlug';
-$pullRequestId = 53;
+$pullRequestId = 192;
 
 $result = $pullRequest->deleteWithdrawPullRequestApproval($projectKey, $repositorySlug, $pullRequestId);
 
 ```
+
+
+#### <a name="create_pull_request"></a>![Method: ](https://apidocs.io/img/method.png ".PullRequestController.createPullRequest") createPullRequest
+
+> Create a new pull request between two branches. The branches may be in the same repository, or different ones.
+>  When using different repositories, they must still be in the same {@link Repository#getHierarchyId() hierarchy}.
+>  <p>
+>  The authenticated user must have <strong>REPO_READ</strong> permission for the "from" and "to"repositories to
+>  call this resource.
+
+
+```php
+function createPullRequest(
+        $pullRequest,
+        $projectKey,
+        $repositorySlug)
+```
+
+#### Parameters
+
+| Parameter | Tags | Description |
+|-----------|------|-------------|
+| pullRequest |  ``` Required ```  | TODO: Add a parameter description |
+| projectKey |  ``` Required ```  | TODO: Add a parameter description |
+| repositorySlug |  ``` Required ```  | TODO: Add a parameter description |
+
+
+
+#### Example Usage
+
+```php
+$pullRequest = new PullRequest();
+$projectKey = 'projectKey';
+$repositorySlug = 'repositorySlug';
+
+$result = $pullRequest->createPullRequest($pullRequest, $projectKey, $repositorySlug);
+
+```
+
+#### Errors
+
+| Error Code | Error Description |
+|------------|-------------------|
+| 400 | The pull request entity supplied in the request was malformed. |
+| 401 | The currently authenticated user has insufficient permissions to create a pull request between the two specified repositories. |
+| 404 | One of the specified repositories or branches does not exist. |
+| 409 | One of the following error cases occurred (check the error message for more details): There was a problem resolving one or more reviewers. The specified branches were the same. The to branch is already up-to-date with all the commits on the from branch. A pull request between the two branches already exists. |
+| 0 | Something goes wrong. |
+
 
 
 [Back to List of Controllers](#list_of_controllers)
@@ -5216,7 +5239,7 @@ function modifyProjectAllUserPermission(
 ```php
 $projectKey = 'projectKey';
 $permission = 'permission';
-$allow = false;
+$allow = true;
 
 $result = $project->modifyProjectAllUserPermission($projectKey, $permission, $allow);
 
@@ -5536,7 +5559,7 @@ function deleteTask($taskId)
 #### Example Usage
 
 ```php
-$taskId = 53;
+$taskId = 192;
 
 $result = $task->deleteTask($taskId);
 
@@ -5574,7 +5597,7 @@ function updateTask(
 
 ```php
 $dynamic = array('key' => 'value');
-$taskId = 53;
+$taskId = 192;
 
 $result = $task->updateTask($dynamic, $taskId);
 
@@ -5601,7 +5624,7 @@ function getTask($taskId)
 #### Example Usage
 
 ```php
-$taskId = 53;
+$taskId = 192;
 
 $result = $task->getTask($taskId);
 
@@ -6204,8 +6227,8 @@ function createPreviewMarkup(
 ```php
 $dynamic = array('key' => 'value');
 $urlMode = 'urlMode';
-$hardwrap = false;
-$htmlEscape = false;
+$hardwrap = true;
+$htmlEscape = true;
 
 $result = $markup->createPreviewMarkup($dynamic, $urlMode, $hardwrap, $htmlEscape);
 

@@ -1305,19 +1305,19 @@ class RepositoryController extends BaseController
      *
      * @param string $projectKey     TODO: type description here
      * @param string $repositorySlug TODO: type description here
+     * @param string $commitId       the commit ID to retrieve
      * @param string $path           (optional) an optional path to filter the commit by. If supplied the details
      *                               returned <i>may not</i>              be for the specified commit. Instead,
      *                               starting from the specified commit, they will be the              details for the
      *                               first commit affecting the specified path.
-     * @param string $commitId       (optional) the commit ID to retrieve
      * @return string response from the API call
      * @throws APIException Thrown if API call fails
      */
     public function getRepositoryCommit(
         $projectKey,
         $repositorySlug,
-        $path = null,
-        $commitId = null
+        $commitId,
+        $path = null
     ) {
 
         //the base uri for api requests
@@ -1486,7 +1486,7 @@ class RepositoryController extends BaseController
      * @param string $visibility  (optional) (optional) if specified, this will limit the resulting repository list
      *                            based on the                     repositories visibility. Valid values are
      *                            <em>public</em> or <em>private</em>.
-     * @return string response from the API call
+     * @return mixed response from the API call
      * @throws APIException Thrown if API call fails
      */
     public function getRepositories(
@@ -1515,7 +1515,8 @@ class RepositoryController extends BaseController
 
         //prepare headers
         $_headers = array (
-            'user-agent'    => 'APIMATIC 2.0'
+            'user-agent'    => 'APIMATIC 2.0',
+            'Accept'        => 'application/json'
         );
 
         //set HTTP basic auth parameters
@@ -1541,7 +1542,9 @@ class RepositoryController extends BaseController
         //handle errors defined at the API level
         $this->validateResponse($_httpResponse, $_httpContext);
 
-        return $response->body;
+        $mapper = $this->getJsonMapper();
+
+        return $mapper->mapClass($response->body, 'StashAPILib\\Models\\RepositoriesPaginated');
     }
 
     /**
@@ -1919,7 +1922,7 @@ class RepositoryController extends BaseController
      *
      * @param string $repositorySlug the repository slug
      * @param string $projectKey     the parent project key
-     * @return string response from the API call
+     * @return mixed response from the API call
      * @throws APIException Thrown if API call fails
      */
     public function getRepository(
@@ -1944,7 +1947,8 @@ class RepositoryController extends BaseController
 
         //prepare headers
         $_headers = array (
-            'user-agent'    => 'APIMATIC 2.0'
+            'user-agent'    => 'APIMATIC 2.0',
+            'Accept'        => 'application/json'
         );
 
         //set HTTP basic auth parameters
@@ -1970,7 +1974,9 @@ class RepositoryController extends BaseController
         //handle errors defined at the API level
         $this->validateResponse($_httpResponse, $_httpContext);
 
-        return $response->body;
+        $mapper = $this->getJsonMapper();
+
+        return $mapper->mapClass($response->body, 'StashAPILib\\Models\\Repository');
     }
 
     /**

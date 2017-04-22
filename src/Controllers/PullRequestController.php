@@ -1149,7 +1149,7 @@ class PullRequestController extends BaseController
      *                               attributes
      * @param bool   $withProperties (optional) (optional) defaults to true, whether to return additional pull request
      *                               properties
-     * @return string response from the API call
+     * @return mixed response from the API call
      * @throws APIException Thrown if API call fails
      */
     public function getPullRequests(
@@ -1191,7 +1191,8 @@ class PullRequestController extends BaseController
 
         //prepare headers
         $_headers = array (
-            'user-agent'    => 'APIMATIC 2.0'
+            'user-agent'    => 'APIMATIC 2.0',
+            'Accept'        => 'application/json'
         );
 
         //set HTTP basic auth parameters
@@ -1214,80 +1215,29 @@ class PullRequestController extends BaseController
             $this->getHttpCallBack()->callOnAfterRequest($_httpContext);
         }
 
-        //handle errors defined at the API level
-        $this->validateResponse($_httpResponse, $_httpContext);
-
-        return $response->body;
-    }
-
-    /**
-     * Create a new pull request between two branches. The branches may be in the same repository, or
-     * different ones.
-     * When using different repositories, they must still be in the same {@link
-     * Repository#getHierarchyId() hierarchy}.
-     * <p>
-     * The authenticated user must have <strong>REPO_READ</strong> permission for the "from" and
-     * "to"repositories to
-     * call this resource.
-     *
-     * @param object $dynamic        TODO: type description here
-     * @param string $projectKey     TODO: type description here
-     * @param string $repositorySlug TODO: type description here
-     * @return string response from the API call
-     * @throws APIException Thrown if API call fails
-     */
-    public function createPullRequest(
-        $dynamic,
-        $projectKey,
-        $repositorySlug
-    ) {
-
-        //the base uri for api requests
-        $_queryBuilder = sprintf(Configuration::$BASEURI, Configuration::$stashDomain);
-        
-        //prepare query string for API call
-        $_queryBuilder = $_queryBuilder.
-            '/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests';
-
-        //process optional query parameters
-        $_queryBuilder = APIHelper::appendUrlWithTemplateParameters($_queryBuilder, array (
-            'projectKey'     => $projectKey,
-            'repositorySlug' => $repositorySlug,
-            ));
-
-        //validate and preprocess url
-        $_queryUrl = APIHelper::cleanUrl($_queryBuilder);
-
-        //prepare headers
-        $_headers = array (
-            'user-agent'    => 'APIMATIC 2.0',
-            'content-type'  => 'application/json; charset=utf-8'
-        );
-
-        //set HTTP basic auth parameters
-        Request::auth(Configuration::$basicAuthUserName, Configuration::$basicAuthPassword);
-
-        //call on-before Http callback
-        $_httpRequest = new HttpRequest(HttpMethod::POST, $_headers, $_queryUrl);
-        if ($this->getHttpCallBack() != null) {
-            $this->getHttpCallBack()->callOnBeforeRequest($_httpRequest);
+        //Error handling using HTTP status codes
+        if ($response->code == 400) {
+            throw new Exceptions\ApiErrorsException('The request was malformed.', $_httpContext);
         }
 
-        //and invoke the API call request to fetch the response
-        $response = Request::post($_queryUrl, $_headers, Request\Body::Json($dynamic));
+        if ($response->code == 401) {
+            throw new Exceptions\ApiErrorsException('The currently authenticated user has insufficient permissions to view the specified pull request.', $_httpContext);
+        }
 
-        $_httpResponse = new HttpResponse($response->code, $response->headers, $response->raw_body);
-        $_httpContext = new HttpContext($_httpRequest, $_httpResponse);
+        if ($response->code == 404) {
+            throw new Exceptions\ApiErrorsException('The specified repository or pull request does not exist.', $_httpContext);
+        }
 
-        //call on-after Http callback
-        if ($this->getHttpCallBack() != null) {
-            $this->getHttpCallBack()->callOnAfterRequest($_httpContext);
+        if (($response->code < 200) || ($response->code > 208)) {
+            throw new Exceptions\ApiErrorsException('Something goes wrong.', $_httpContext);
         }
 
         //handle errors defined at the API level
         $this->validateResponse($_httpResponse, $_httpContext);
 
-        return $response->body;
+        $mapper = $this->getJsonMapper();
+
+        return $mapper->mapClass($response->body, 'StashAPILib\\Models\\PullRequestsPaginated');
     }
 
     /**
@@ -1694,7 +1644,7 @@ class PullRequestController extends BaseController
      * @param string $projectKey     TODO: type description here
      * @param string $repositorySlug TODO: type description here
      * @param string $pullRequestId  TODO: type description here
-     * @return string response from the API call
+     * @return mixed response from the API call
      * @throws APIException Thrown if API call fails
      */
     public function getPullRequest(
@@ -1722,7 +1672,8 @@ class PullRequestController extends BaseController
 
         //prepare headers
         $_headers = array (
-            'user-agent'    => 'APIMATIC 2.0'
+            'user-agent'    => 'APIMATIC 2.0',
+            'Accept'        => 'application/json'
         );
 
         //set HTTP basic auth parameters
@@ -1748,7 +1699,9 @@ class PullRequestController extends BaseController
         //handle errors defined at the API level
         $this->validateResponse($_httpResponse, $_httpContext);
 
-        return $response->body;
+        $mapper = $this->getJsonMapper();
+
+        return $mapper->mapClass($response->body, 'StashAPILib\\Models\\PullRequest');
     }
 
     /**
@@ -2192,5 +2145,99 @@ class PullRequestController extends BaseController
         $this->validateResponse($_httpResponse, $_httpContext);
 
         return $response->body;
+    }
+
+    /**
+     * Create a new pull request between two branches. The branches may be in the same repository, or
+     * different ones.
+     * When using different repositories, they must still be in the same {@link
+     * Repository#getHierarchyId() hierarchy}.
+     * <p>
+     * The authenticated user must have <strong>REPO_READ</strong> permission for the "from" and
+     * "to"repositories to
+     * call this resource.
+     *
+     * @param Models\PullRequest $pullRequest    TODO: type description here
+     * @param string             $projectKey     TODO: type description here
+     * @param string             $repositorySlug TODO: type description here
+     * @return mixed response from the API call
+     * @throws APIException Thrown if API call fails
+     */
+    public function createPullRequest(
+        $pullRequest,
+        $projectKey,
+        $repositorySlug
+    ) {
+
+        //the base uri for api requests
+        $_queryBuilder = sprintf(Configuration::$BASEURI, Configuration::$stashDomain);
+        
+        //prepare query string for API call
+        $_queryBuilder = $_queryBuilder.
+            '/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests';
+
+        //process optional query parameters
+        $_queryBuilder = APIHelper::appendUrlWithTemplateParameters($_queryBuilder, array (
+            'projectKey'     => $projectKey,
+            'repositorySlug' => $repositorySlug,
+            ));
+
+        //validate and preprocess url
+        $_queryUrl = APIHelper::cleanUrl($_queryBuilder);
+
+        //prepare headers
+        $_headers = array (
+            'user-agent'    => 'APIMATIC 2.0',
+            'Accept'        => 'application/json',
+            'content-type'  => 'application/json; charset=utf-8'
+        );
+
+        //set HTTP basic auth parameters
+        Request::auth(Configuration::$basicAuthUserName, Configuration::$basicAuthPassword);
+
+        //call on-before Http callback
+        $_httpRequest = new HttpRequest(HttpMethod::POST, $_headers, $_queryUrl);
+        if ($this->getHttpCallBack() != null) {
+            $this->getHttpCallBack()->callOnBeforeRequest($_httpRequest);
+        }
+
+        //and invoke the API call request to fetch the response
+        $response = Request::post($_queryUrl, $_headers, Request\Body::Json($pullRequest));
+
+        $_httpResponse = new HttpResponse($response->code, $response->headers, $response->raw_body);
+        $_httpContext = new HttpContext($_httpRequest, $_httpResponse);
+
+        //call on-after Http callback
+        if ($this->getHttpCallBack() != null) {
+            $this->getHttpCallBack()->callOnAfterRequest($_httpContext);
+        }
+
+        //Error handling using HTTP status codes
+        if ($response->code == 400) {
+            throw new Exceptions\ApiErrorsException('The pull request entity supplied in the request was malformed.', $_httpContext);
+        }
+
+        if ($response->code == 401) {
+            throw new Exceptions\ApiErrorsException('The currently authenticated user has insufficient permissions to create a pull request between the two specified repositories.', $_httpContext);
+        }
+
+        if ($response->code == 404) {
+            throw new Exceptions\ApiErrorsException('One of the specified repositories or branches does not exist.', $_httpContext);
+        }
+
+        if ($response->code == 409) {
+            throw new Exceptions\ApiErrorsException('One of the following error cases occurred (check the error message for more details): There was a problem resolving one or more reviewers. The specified branches were the same. The to branch is already up-to-date with all the commits on the from branch. A pull request between the two branches already exists.', $_httpContext);
+        }
+
+        if (($response->code < 200) || ($response->code > 208)) {
+            throw new Exceptions\ApiErrorsException('Something goes wrong.', $_httpContext);
+        }
+
+        //handle errors defined at the API level
+        $this->validateResponse($_httpResponse, $_httpContext);
+
+        $mapper = $this->getJsonMapper();
+
+        return $mapper->mapClass($response->body, 'StashAPILib\\Models\\PullRequest');
     }
 }

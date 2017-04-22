@@ -56,13 +56,45 @@ class BaseController
     {
         $mapper = new JsonMapper();
         $mapper->sAdditionalPropertiesCollectionMethod = 'addAdditionalProperty';
+        $mapper->arChildClasses['StashAPILib\\Models\\Pagination'] = array(
+            'StashAPILib\\Models\\RepositoriesPaginated', 
+            'StashAPILib\\Models\\PullRequestsPaginated'
+        );
         return $mapper;
     }
 
     protected function validateResponse(HttpResponse $response, HttpContext $_httpContext)
     {
+        if ($response->getStatusCode() == 400) {
+            throw new Exceptions\ApiErrorsException('Bad request', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 401) {
+            throw new Exceptions\ApiErrorsException('Unauthorized', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 403) {
+            throw new Exceptions\ApiErrorsException('Forbidden', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 404) {
+            throw new Exceptions\ApiErrorsException('Not Found', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 405) {
+            throw new Exceptions\ApiErrorsException('Method Not Allowed', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 409) {
+            throw new Exceptions\ApiErrorsException('Conflict', $_httpContext);
+        }
+
+        if ($response->getStatusCode() == 415) {
+            throw new Exceptions\ApiErrorsException('Unsupported Media Type', $_httpContext);
+        }
+
         if (($response->getStatusCode() < 200) || ($response->getStatusCode() > 208)) { //[200,208] = HTTP OK
-            throw new APIException('HTTP Response Not OK', $_httpContext);
+            throw new Exceptions\ApiErrorsException('API errors', $_httpContext);
         }
     }
 }
